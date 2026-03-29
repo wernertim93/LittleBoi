@@ -90,10 +90,10 @@ void setup() {
 
   if (strlen(ap_password) > 0) {
     WiFi.softAP(ap_ssid, ap_password);
-    Serial.println("AP mit Passwort gestartet");
+    Serial.println("AP started with password");
   } else {
     WiFi.softAP(ap_ssid);
-    Serial.println("AP OHNE Passwort (offen) gestartet");
+    Serial.println("AP started without password (open connection)");
   }
 
   IPAddress IP = WiFi.softAPIP();

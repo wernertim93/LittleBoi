@@ -35,10 +35,12 @@
 char *CommandArray [CommandArray_SIZE]; // this is reused each call
 char *strData = NULL; // this is allocated in separate and needs to be free( ) eventually
 
-const char * ssid = "SINGTEL-42E6";//Change your wifi name
+const char * ssid = "LittleBoi_Robot";//Change your wifi name
 const char * password = "huiweimaev";//Change your wifi password
 const char * BroadcastData = "";
+
 AsyncUDP udp;
+AsyncWebServer server(80); // HTTP Server to Port 80
 String PhrasedData = "";
 
 int Speed=255;
@@ -84,14 +86,25 @@ void setup() {
   pinMode(BIN2,OUTPUT);
   Serial.begin(115200);
   //-startwifi  
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, password);
-    if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-        Serial.println("WiFi Failed");
-        while(1) {
-            vTaskDelay(500/ portTICK_RATE_MS);
-        }
-    }
+    WiFi.mode(WIFI_AP);
+
+  if (strlen(ap_password) > 0) {
+    WiFi.softAP(ap_ssid, ap_password);
+    Serial.println("AP mit Passwort gestartet");
+  } else {
+    WiFi.softAP(ap_ssid);
+    Serial.println("AP OHNE Passwort (offen) gestartet");
+  }
+
+  IPAddress IP = WiFi.softAPIP();
+  Serial.print("AP IP-Adress: ");
+  Serial.println(IP);
+  Serial.println("Connect with WLAN '" + String(ap_ssid) + "'");
+  Serial.println("and send command to:");
+  Serial.println("  HTTP: " + IP.toString() + ":80/cmd");
+  Serial.println("  UDP:  " + IP.toString() + ":1234");
+  Serial.println("======================================\n");
+
       // Recieve data through wifi
   if(udp.listen(1234)) {//UDP port number if there is any problem change this.
         Serial.print("UDP Listening on IP: ");
@@ -117,6 +130,45 @@ void setup() {
             Serial.println(PhrasedData);   
         });      
   }
+
+    // ======= Start HTTP SERVER =======
+  // CORS Headers for Browser-Acess
+  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // POST /cmd - receive command (format: "f 150 yes no")
+  server.on("/cmd", HTTP_POST, [](AsyncWebServerRequest *request){}, NULL,
+    [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      // read data as string
+      String message = "";
+      for (size_t i = 0; i < len; i++) {
+        message += (char)data[i];
+      }
+      
+      PhrasedData = message;
+      
+      Serial.print("HTTP received: ");
+      Serial.println(PhrasedData);
+      
+      request->send(200, "text/plain", "OK");
+    });
+
+  // OPTIONS /cmd - Preflight for CORS
+  server.on("/cmd", HTTP_OPTIONS, [](AsyncWebServerRequest *request){
+    request->send(200);
+  });
+
+  // GET / - Mobile Controller Interface
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", MOBILE_HTML);
+  });
+
+  server.begin();
+  Serial.println("HTTP Server runs on port 80");
+  Serial.println("Endpoint: POST http://" + IP.toString() + "/cmd");
+  Serial.println("======================================\n");
+
  //display 
  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
     Serial.println(F("SSD1306 allocation failed"));
@@ -173,5 +225,5 @@ void Plzgetstring(String phraseData)
  // for (int n = 0; n < N; n++) {
    // Serial.println (CommandArray [n]);
  // }
-  freeData(&strData);
+  //freeData(&strData);
 }

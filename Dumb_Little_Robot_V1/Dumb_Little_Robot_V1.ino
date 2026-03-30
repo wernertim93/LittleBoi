@@ -14,6 +14,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "WiFi.h"
+#include <ESPAsyncWebServer.h>
 #include "roboteyes.h"
 #include "AsyncUDP.h"
 #include "seperatestring.h"
@@ -41,6 +42,8 @@ char *strData = NULL; // this is allocated in separate and needs to be free( ) e
 
 const char * ssid = "LittleBoi_Robot";//Change your wifi name
 const char * password = "huiweimaev";//Change your wifi password
+const char * ap_ssid = ssid;
+const char * ap_password = password;
 const char * BroadcastData = "";
 
 AsyncUDP udp;
@@ -229,5 +232,5 @@ void Plzgetstring(String phraseData)
  // for (int n = 0; n < N; n++) {
    // Serial.println (CommandArray [n]);
  // }
-  //freeData(&strData);
+  freeData(&strData);
 }

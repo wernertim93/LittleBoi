@@ -51,10 +51,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#0F172A;
 <div class="status err" id="s">⚠️ Connecting...</div>
 <div class="ctrl">
 <div class="pad">
-<button class="btn" ontouchstart="c('f')" ontouchend="c('s')" onmousedown="c('f')" onmouseup="c('s')">⬆️</button>
-<button class="btn" ontouchstart="c('l')" ontouchend="c('s')" onmousedown="c('l')" onmouseup="c('s')">⬅️</button>
-<button class="btn" ontouchstart="c('r')" ontouchend="c('s')" onmousedown="c('r')" onmouseup="c('s')">➡️</button>
-<button class="btn" ontouchstart="c('b')" ontouchend="c('s')" onmousedown="c('b')" onmouseup="c('s')">⬇️</button>
+<button class="btn" ontouchstart="t(event,'f')" ontouchend="t(event,'s')" onmousedown="hold('f')" onmouseup="release()">⬆️</button>
+<button class="btn" ontouchstart="t(event,'l')" ontouchend="t(event,'s')" onmousedown="hold('l')" onmouseup="release()">⬅️</button>
+<button class="btn" ontouchstart="t(event,'r')" ontouchend="t(event,'s')" onmousedown="hold('r')" onmouseup="release()">➡️</button>
+<button class="btn" ontouchstart="t(event,'b')" ontouchend="t(event,'s')" onmousedown="hold('b')" onmouseup="release()">⬇️</button>
 </div>
 <div class="spd">
 <label>⚡ Speed</label>
@@ -75,6 +75,21 @@ const logPanel=document.getElementById('logpanel');
 const logContent=document.getElementById('logcontent');
 const logToggle=document.getElementById('logtoggle');
 let logEnabled=false;
+let holdInterval=null;
+function t(e,cmd){
+  e.preventDefault();
+  if(cmd==='s') release();
+  else hold(cmd);
+}
+function hold(cmd){
+  c(cmd);
+  if(holdInterval) clearInterval(holdInterval);
+  holdInterval=setInterval(()=>c(cmd),100);
+}
+function release(){
+  if(holdInterval){clearInterval(holdInterval);holdInterval=null;}
+  c('s');
+}
 function toggleLog(){
 logEnabled=!logEnabled;
 logPanel.classList.toggle('show',logEnabled);

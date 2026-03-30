@@ -4,6 +4,9 @@
  * This is the first version of this project. I have only added basic expressions more are coming in the future. 
  * I will also add SLAM and Swarming features in the future.
  * Download the wifi app from Git Hub. Get the Ip address from the serial monitor. UDP port is 1234 unless you have changed the code.
+ 
+ * ACCESS POINT MODE: The ESP32 creates its own WiFi network "LittleBoi_Robot"
+ * Connect to this network and send commands to 192.168.4.1:80 (HTTP) or :1234 (UDP)
  */
 
 
@@ -15,6 +18,7 @@
 #include "AsyncUDP.h"
 #include "seperatestring.h"
 #include "MotorController.h"
+#include "mobile_html.h"
 #define freertos/queue.h
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels

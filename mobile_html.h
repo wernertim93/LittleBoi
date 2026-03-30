@@ -1,9 +1,9 @@
-// Mobile Controller HTML (komprimiert)
-// Diese Datei in Dumb_Little_Robot_V1.ino einfügen (vor setup())
+// Mobile Controller HTML (compressed)
+// Insert this file in Dumb_Little_Robot_V1.ino (before setup())
 
 const char MOBILE_HTML[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
@@ -48,7 +48,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#0F172A;
 <h1>🤖 TinyDeskBot</h1>
 <button class="toggle" id="logtoggle" onclick="toggleLog()">📋 Log</button>
 </div>
-<div class="status err" id="s">⚠️ Verbinde...</div>
+<div class="status err" id="s">⚠️ Connecting...</div>
 <div class="ctrl">
 <div class="pad">
 <button class="btn" ontouchstart="c('f')" ontouchend="c('s')" onmousedown="c('f')" onmouseup="c('s')">⬆️</button>
@@ -57,15 +57,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#0F172A;
 <button class="btn" ontouchstart="c('b')" ontouchend="c('s')" onmousedown="c('b')" onmouseup="c('s')">⬇️</button>
 </div>
 <div class="spd">
-<label>⚡ Geschwindigkeit</label>
+<label>⚡ Speed</label>
 <input type="range" id="sp" min="50" max="255" value="150" oninput="document.getElementById('v').textContent=this.value">
 <div class="val" id="v">150</div>
 </div>
 </div>
 <div class="log" id="logpanel">
 <div class="log-header">
-<h3>📋 Protokoll</h3>
-<button class="log-clear" onclick="clearLog()">Löschen</button>
+<h3>📋 Log</h3>
+<button class="log-clear" onclick="clearLog()">Clear</button>
 </div>
 <div id="logcontent"></div>
 </div>
@@ -86,7 +86,7 @@ logContent.innerHTML='';
 }
 function addLog(msg,type){
 if(!logEnabled)return;
-const t=new Date().toLocaleTimeString('de-DE');
+const t=new Date().toLocaleTimeString('en-US');
 const e=document.createElement('div');
 e.className='log-entry '+type;
 e.textContent=t+' | '+msg;
@@ -101,15 +101,15 @@ fetch('/cmd',{method:'POST',body:m})
 .then(r=>{
 if(r.ok){
 st.className='status ok';
-st.textContent='✅ Verbunden';
+st.textContent='✅ Connected';
 addLog('← OK','recv');
 }else{
-addLog('← Fehler: '+r.status,'err');
+addLog('← Error: '+r.status,'err');
 }
 })
 .catch(e=>{
 st.className='status err';
-st.textContent='⚠️ Fehler';
+st.textContent='⚠️ Error';
 addLog('← '+e.message,'err');
 });
 }

@@ -20,7 +20,7 @@
 #include "seperatestring.h"
 #include "MotorController.h"
 #include "mobile_html.h"
-#define freertos/queue.h
+#include "freertos/queue.h"
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -168,7 +168,7 @@ void setup() {
 
   // GET / - Mobile Controller Interface
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", MOBILE_HTML);
+    request->send(200, "text/html", MOBILE_HTML);
   });
 
   server.begin();
@@ -188,9 +188,9 @@ void setup() {
     "dispTask", // Task name
     4096,       // Stack size
     NULL,       // No parameters
-    0,          // Priority
-    &xHandle,       // No handle returned
-    0);
+    1,          // Priority (1 = above idle, so HTTP on core 0 won't starve it)
+    &xHandle,   // No handle returned
+    1);         // Core 1 (loop() and HTTP run on core 0)
 
 }
 void loop() {
